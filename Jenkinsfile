@@ -13,9 +13,14 @@ pipeline {
           }
         }
         stage('Build Package') {
-            steps {
-                sh 'mvn clean package'
+          steps {
+            sh 'mvn clean package'
+          }
+          post {
+            always {
+              archive 'target/devops.war'
             }
+          }
         }
         stage('How are you?') {
             steps {

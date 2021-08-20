@@ -1,0 +1,21 @@
+version: 0.2
+phases: 
+  install: 
+    commands: 
+      - apt-get update -y
+      - apt-get install -y maven
+      - export DEBIAN_FRONTEND=noninteractive && apt-get install -y awscli
+  pre_build:
+    commands: 
+      - aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 554660509057.dkr.ecr.us-east-2.amazonaws.com
+  build: 
+    commands: 
+      - mvn clean package
+      - docker image build -t sample-app:1.0 .
+  post_build:
+    commands:
+      - docker image tag sample-app:1.0 554660509057.dkr.ecr.us-east-2.amazonaws.com/sample-app:1.0.$CODEBUILD_BUILD_NUMBER
+      - docker image push 554660509057.dkr.ecr.us-east-2.amazonaws.com/sample-app:1.0.$CODEBUILD_BUILD_NUMBER
+artifacts:
+  files: 
+    - target/devops.war
